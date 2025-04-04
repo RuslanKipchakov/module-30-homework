@@ -1,0 +1,50 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install main dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install development dependencies
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Run tests with pytest
+        run: |
+          pytest tests
+
+      - name: Run mypy for type checking
+        run: |
+          mypy app/
+
+      - name: Run black for code formatting
+        run: |
+          black --diff --check app/
+
+      - name: Run isort to check imports
+        run: |
+          isort --check-only app/
+
+      - name: Run flake8 for linting
+        run: |
+          flake8 app/
